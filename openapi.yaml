@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: External Character.AI - OpenAPI 3.0
+  description: |-
+    External Character.AI specification.
+  termsOfService: https://character.ai/tos
+  contact:
+    email: backend-team@character.ai
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.1
+servers:
+  - url: https://neo.character.ai/external
+paths:
+  /chat/completions:
+    post:
+      summary: Create chat completion
+      description: Creates a model response for the given chat conversation.
+      operationId: createChatCompletion
+      parameters:
+        - in: header
+          name: Application-Key
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: X-Routing-Key
+          schema:
+            type: string
+          required: false
+        - in: header
+          name: X-External-User-Id
+          schema:
+            type: string
+          required: false
+      requestBody:
+        description: Create chat completion
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionResponse'
+        '403':
+          description: Invalid API key
+        '405':
+          description: Method Not Allowed
+        '429':
+          description: Too Many Requests
+  /character/{character_id}/greeting/:
+    get:
+      summary: Get character greeting
+      description: Get character greeting by ID
+      operationId: getCharacter
+      parameters:
+        - in: path
+          name: character_id
+          schema:
+            type: string
+          required: true
+          description: Character ID
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CharacterGreetingResponse'
+        '403':
+          description: Invalid API key
+        '404':
+          description: Character not found
+        '405':
+          description: Method Not Allowed
+        '429':
+          description: Too Many Requests
+components:
+  schemas:
+    ChatCompletionRequest:
+      type: object
+      title: Chat completion request
+      properties:
+        user_name:
+          type: string
+          description: The username for which to generate the chat completion.
+        character_id:
+          type: string
+          description: The external character ID from c.ai, from whose perspective the chat completion will be generated.
+        stream:
+          type: bool
+          default: false
+          description: >
+            If set, partial message deltas will be sent, like on c.ai. Response payloads will be sent as data-only server-sent
+            events as they become available, with the stream terminated by `is_final: True`.
+        messages:
+          type: array
+          description: >
+            A list of messages comprising the conversation so far.
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/ChatCompletionRequestMessage"
+      required:
+        - messages
+        - character_id
+    ChatCompletionRequestMessage:
+      type: object
+      title: Chat completion request message
+      properties:
+        role:
+          description: The role of the message's author.
+          type: string
+          enum:
+            - system
+            - user
+            - assistant
+        content:
+          description: The contents of the message.
+          type: string
+        name:
+          type: string
+          description: (unused) An optional name for the participant.
+      required:
+        - content
+        - role
+    ChatCompletionResponse:
+      type: object
+      properties:
+        response:
+          type: string
+        is_final:
+          type: boolean
+      required:
+        - is_final
+        - response
+    CharacterGreetingResponse:
+      type: object
+      properties:
+        greeting:
+          type: string
+      required:
+        - greeting
