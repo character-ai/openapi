@@ -66,6 +66,12 @@ paths:
             type: string
           required: true
           description: Character ID
+        - in: query
+          name: user_name
+          schema:
+            type: string
+          required: false
+          description: User's name to personalize the greeting (optional, defaults to 'user')
       responses:
         '200':
           description: Successful operation
