@@ -8,7 +8,7 @@ info:
     email: backend-team@character.ai
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.1
 servers:
   - url: https://neo.character.ai/external
@@ -100,7 +100,7 @@ components:
           type: string
           description: The external character ID from c.ai, from whose perspective the chat completion will be generated.
         stream:
-          type: bool
+          type: boolean
           default: false
           description: >
             If set, partial message deltas will be sent, like on c.ai. Response payloads will be sent as data-only server-sent
@@ -112,6 +112,8 @@ components:
           minItems: 1
           items:
             $ref: "#/components/schemas/ChatCompletionRequestMessage"
+        model:
+          $ref: "#/components/schemas/ModelType"
       required:
         - messages
         - character_id
@@ -152,3 +154,9 @@ components:
           type: string
       required:
         - greeting
+    ModelType:
+      type: string
+      title: Model type
+      enum:
+        - default
+        - safe
